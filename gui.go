@@ -273,11 +273,12 @@ func cursorRight(g *gocui.Gui, v *gocui.View) error {
 func refreshDetailsView(g *gocui.Gui) error {
 	mainView, _ := g.View(mainView)
 	_, cy := mainView.Cursor()
+	_, oy := mainView.Origin()
 
 	detailsView, _ := g.View("details")
 	detailsView.Clear()
 
-	item := itemsPerSite[site][cy]
+	item := itemsPerSite[site][cy+oy]
 
 	fmt.Fprintf(detailsView, "[%s]\n%s", item.title, item.description)
 	return nil
@@ -289,8 +290,9 @@ func refreshMainView(g *gocui.Gui, v *gocui.View) error {
 
 	mainView, _ := g.View(mainView)
 	_, cy := v.Cursor()
+	_, oy := v.Origin()
 
-	if l, err = v.Line(cy); err != nil {
+	if l, err = v.Line(cy + oy); err != nil {
 		l = ""
 	}
 
