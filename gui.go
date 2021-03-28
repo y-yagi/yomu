@@ -5,7 +5,6 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
-	"strings"
 
 	"github.com/y-yagi/gocui"
 )
@@ -149,12 +148,17 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	cx, cy := v.Cursor()
-	lineCount := len(strings.Split(v.ViewBuffer(), "\n"))
-	if cy+1 == lineCount-2 {
-		return nil
+	ox, oy := v.Origin()
+
+	cy += 1
+	if cy+oy >= len(itemsPerSite[site]) {
+		cy = 0
+		if err := v.SetOrigin(ox, 0); err != nil {
+			return err
+		}
 	}
-	if err := v.SetCursor(cx, cy+1); err != nil {
-		ox, oy := v.Origin()
+
+	if err := v.SetCursor(cx, cy); err != nil {
 		if err := v.SetOrigin(ox, oy+1); err != nil {
 			return err
 		}
@@ -164,21 +168,31 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 }
 
 func cursorUp(g *gocui.Gui, v *gocui.View) error {
-	var err error
-
 	if v == nil {
-		if v, err = g.SetCurrentView(mainView); err != nil {
-			return err
-		}
+		v = g.Views()[0]
 	}
 
 	ox, oy := v.Origin()
 	cx, cy := v.Cursor()
-	if err := v.SetCursor(cx, cy-1); err != nil && oy > 0 {
+	_, maxY := g.Size()
+
+	cy -= 1
+	if cy < 0 {
+		cy = len(itemsPerSite[site]) - 1
+	}
+
+	if cy > maxY {
+		if err := v.SetOrigin(ox, cy); err != nil {
+			return err
+		}
+	}
+
+	if err := v.SetCursor(cx, cy); err != nil && oy > 0 {
 		if err := v.SetOrigin(ox, oy-1); err != nil {
 			return err
 		}
 	}
+
 	return drawInfoViews(g, v)
 }
 
