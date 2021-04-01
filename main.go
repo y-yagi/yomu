@@ -94,7 +94,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	}
 
 	var wg sync.WaitGroup
-	for url, _ := range cfg.URLs {
+	for url := range cfg.URLs {
 		wg.Add(1)
 		go fetch(url, errStream, &wg)
 	}
