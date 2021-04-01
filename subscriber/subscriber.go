@@ -6,7 +6,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/y-yagi/configure"
-	"github.com/y-yagi/goext/arr"
 	"github.com/y-yagi/rssfinder"
 	"github.com/y-yagi/yomu/utils"
 )
@@ -36,28 +35,27 @@ func (s *Subscriber) Subscribe(rawurl string) error {
 	}
 
 	if len(feeds) == 1 {
-		s.cfg.URLs = append(s.cfg.URLs, feeds[0].Href)
+		s.cfg.URLs[feeds[0].Href] = feeds[0].Title
 	} else {
-		urls := s.ask(&feeds)
-		for _, url := range urls {
-			s.cfg.URLs = append(s.cfg.URLs, url)
+		urlWithTitle := s.ask(&feeds)
+		for href, title := range urlWithTitle {
+			s.cfg.URLs[href] = title
 		}
 	}
 
-	s.cfg.URLs = arr.UniqueStrings(s.cfg.URLs)
 	return configure.Save(s.app, s.cfg)
 }
 
-func (s *Subscriber) ask(feeds *[]*rssfinder.Feed) []string {
+func (s *Subscriber) ask(feeds *[]*rssfinder.Feed) map[string]string {
 	selected := []string{}
 	options := []string{}
-	urls := []string{}
-	dict := map[string]string{}
+	urlWithTitle := map[string]string{}
+	dict := map[string]*rssfinder.Feed{}
 
 	for _, feed := range *feeds {
 		key := "<" + feed.Title + "> " + feed.Href
 		options = append(options, key)
-		dict[key] = feed.Href
+		dict[key] = feed
 	}
 
 	prompt := &survey.MultiSelect{
@@ -67,8 +65,9 @@ func (s *Subscriber) ask(feeds *[]*rssfinder.Feed) []string {
 	survey.AskOne(prompt, &selected)
 
 	for _, u := range selected {
-		urls = append(urls, dict[u])
+		feed := dict[u]
+		urlWithTitle[feed.Href] = feed.Title
 	}
 
-	return urls
+	return urlWithTitle
 }

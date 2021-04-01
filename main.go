@@ -31,7 +31,7 @@ const (
 func init() {
 	f := filepath.Join(configure.ConfigDir(app), "config.toml")
 	if !osext.IsExist(f) {
-		c := utils.Config{Browser: "google-chrome"}
+		c := utils.Config{Browser: "google-chrome", URLs: map[string]string{}}
 		configure.Save(app, c)
 	}
 }
@@ -58,6 +58,10 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		return
 	}
 
+	if cfg.URLs == nil {
+		cfg.URLs = map[string]string{}
+	}
+
 	if configureFlag {
 		if err = editConfig(); err != nil {
 			fmt.Fprintf(outStream, "%v\n", err)
@@ -76,7 +80,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	}
 
 	var wg sync.WaitGroup
-	for _, url := range cfg.URLs {
+	for url, _ := range cfg.URLs {
 		wg.Add(1)
 		go fetch(url, errStream, &wg)
 	}
