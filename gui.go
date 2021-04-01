@@ -5,6 +5,7 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/y-yagi/gocui"
 )
@@ -148,6 +149,14 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	cx, cy := v.Cursor()
+
+	if v.Name() == sideView {
+		lineCount := len(strings.Split(v.ViewBuffer(), "\n"))
+		if cy+1 == lineCount-2 {
+			return nil
+		}
+	}
+
 	ox, oy := v.Origin()
 
 	cy += 1
@@ -174,6 +183,15 @@ func cursorUp(g *gocui.Gui, v *gocui.View) error {
 
 	ox, oy := v.Origin()
 	cx, cy := v.Cursor()
+	if v.Name() == sideView {
+		if err := v.SetCursor(cx, cy-1); err != nil && oy > 0 {
+			if err := v.SetOrigin(ox, oy-1); err != nil {
+				return err
+			}
+		}
+		return drawInfoViews(g, v)
+	}
+
 	_, maxY := g.Size()
 
 	cy -= 1
