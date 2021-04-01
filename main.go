@@ -149,6 +149,4 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	}
 
 	itemsPerSite[feed.Title] = items
-
-	return
 }
