@@ -12,22 +12,13 @@ import (
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/gocui"
 	"github.com/y-yagi/goext/osext"
+	"github.com/y-yagi/yomu/subscriber"
+	"github.com/y-yagi/yomu/utils"
 )
 
-type config struct {
-	URLs    []string `toml:"urls"`
-	Browser string   `toml:"browser"`
-}
-
-type Item struct {
-	title       string
-	link        string
-	description string
-}
-
 var (
-	cfg          config
-	itemsPerSite = map[string][]Item{}
+	cfg          utils.Config
+	itemsPerSite = map[string][]utils.Item{}
 	site         string
 )
 
@@ -40,7 +31,7 @@ const (
 func init() {
 	f := filepath.Join(configure.ConfigDir(app), "config.toml")
 	if !osext.IsExist(f) {
-		c := config{Browser: "google-chrome"}
+		c := utils.Config{Browser: "google-chrome"}
 		configure.Save(app, c)
 	}
 }
@@ -51,11 +42,13 @@ func main() {
 
 func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	var configureFlag bool
+	var subscribe string
 	exitCode = 0
 
 	flags := flag.NewFlagSet(app, flag.ExitOnError)
 	flags.SetOutput(errStream)
 	flags.BoolVar(&configureFlag, "c", false, "configure")
+	flags.StringVar(&subscribe, "s", "", "subscribe an `URL`")
 	flags.Parse(args[1:])
 
 	err := configure.Load(app, &cfg)
@@ -67,6 +60,15 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 
 	if configureFlag {
 		if err = editConfig(); err != nil {
+			fmt.Fprintf(outStream, "%v\n", err)
+			exitCode = 1
+		}
+		return
+	}
+
+	if len(subscribe) != 0 {
+		s := subscriber.NewSubscriber(app, cfg)
+		if err = s.Subscribe(subscribe); err != nil {
 			fmt.Fprintf(outStream, "%v\n", err)
 			exitCode = 1
 		}
@@ -118,13 +120,13 @@ func editConfig() error {
 func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	var items []Item
+	var items []utils.Item
 
 	fp := gofeed.NewParser()
 	feed, _ := fp.ParseURL(url)
 
 	for _, item := range feed.Items {
-		item := Item{title: item.Title, link: item.Link, description: item.Description}
+		item := utils.Item{Title: item.Title, Link: item.Link, Description: item.Description}
 		items = append(items, item)
 	}
 

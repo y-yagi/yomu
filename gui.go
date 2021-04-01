@@ -71,7 +71,7 @@ func layout(g *gocui.Gui) error {
 		v.SelFgColor = gocui.ColorBlack
 
 		for _, i := range itemsPerSite[site] {
-			fmt.Fprintln(v, i.link)
+			fmt.Fprintln(v, i.Link)
 		}
 	}
 
@@ -280,7 +280,7 @@ func refreshDetailsView(g *gocui.Gui) error {
 
 	item := itemsPerSite[site][cy+oy]
 
-	fmt.Fprintf(detailsView, "[%s]\n%s", item.title, item.description)
+	fmt.Fprintf(detailsView, "[%s]\n%s", item.Title, item.Description)
 	return nil
 }
 
@@ -299,7 +299,7 @@ func refreshMainView(g *gocui.Gui, v *gocui.View) error {
 	if len(l) != 0 {
 		mainView.Clear()
 		for _, r := range itemsPerSite[l] {
-			fmt.Fprintln(mainView, r.link)
+			fmt.Fprintln(mainView, r.Link)
 		}
 	}
 	return nil
