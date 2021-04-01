@@ -13,6 +13,7 @@ import (
 	"github.com/y-yagi/gocui"
 	"github.com/y-yagi/goext/osext"
 	"github.com/y-yagi/yomu/subscriber"
+	"github.com/y-yagi/yomu/unsubscriber"
 	"github.com/y-yagi/yomu/utils"
 )
 
@@ -42,6 +43,7 @@ func main() {
 
 func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	var configureFlag bool
+	var unsubscribeFlag bool
 	var subscribe string
 	exitCode = 0
 
@@ -49,6 +51,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	flags.SetOutput(errStream)
 	flags.BoolVar(&configureFlag, "c", false, "configure")
 	flags.StringVar(&subscribe, "s", "", "subscribe an `URL`")
+	flags.BoolVar(&unsubscribeFlag, "u", false, "unsubscribe feeds")
 	flags.Parse(args[1:])
 
 	err := configure.Load(app, &cfg)
@@ -67,12 +70,23 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 			fmt.Fprintf(outStream, "%v\n", err)
 			exitCode = 1
 		}
+		fmt.Fprint(outStream, "Done!\n")
 		return
 	}
 
 	if len(subscribe) != 0 {
 		s := subscriber.NewSubscriber(app, cfg)
 		if err = s.Subscribe(subscribe); err != nil {
+			fmt.Fprintf(outStream, "%v\n", err)
+			exitCode = 1
+		}
+		fmt.Fprint(outStream, "Done!\n")
+		return
+	}
+
+	if unsubscribeFlag {
+		u := unsubscriber.NewUnsubscriber(app, cfg)
+		if err = u.Unsubscribe(); err != nil {
 			fmt.Fprintf(outStream, "%v\n", err)
 			exitCode = 1
 		}
