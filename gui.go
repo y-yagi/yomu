@@ -255,9 +255,9 @@ func setSite(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func cursorLeft(g *gocui.Gui, v *gocui.View) error {
-	var err error
-	if v, err = g.SetCurrentView(sideView); err != nil {
+func cursorLeft(g *gocui.Gui, view *gocui.View) error {
+	v, err := g.SetCurrentView(sideView)
+	if err != nil {
 		return err
 	}
 
@@ -271,9 +271,9 @@ func cursorLeft(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func cursorRight(g *gocui.Gui, v *gocui.View) error {
-	var err error
-	if v, err = g.SetCurrentView(mainView); err != nil {
+func cursorRight(g *gocui.Gui, view *gocui.View) error {
+	v, err := g.SetCurrentView(mainView)
+	if err != nil {
 		fmt.Printf("%v\n", err)
 		return err
 	}
