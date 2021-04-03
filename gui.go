@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 
+	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/y-yagi/gocui"
 )
 
@@ -298,7 +299,7 @@ func refreshDetailsView(g *gocui.Gui) error {
 
 	item := itemsPerSite[site][cy+oy]
 
-	fmt.Fprintf(detailsView, "[%s]\n%s", item.Title, item.Description)
+	fmt.Fprintf(detailsView, "[%s]\n%s", item.Title, strip.StripTags(item.Description))
 	return nil
 }
 

@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.9
+	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/mmcdole/gofeed v1.1.0
 	github.com/nsf/termbox-go v1.1.0 // indirect
