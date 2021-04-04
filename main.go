@@ -70,8 +70,9 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		if err = editConfig(); err != nil {
 			fmt.Fprintf(outStream, "%v\n", err)
 			exitCode = 1
+		} else {
+			fmt.Fprint(outStream, "Done!\n")
 		}
-		fmt.Fprint(outStream, "Done!\n")
 		return
 	}
 
@@ -80,8 +81,9 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		if err = s.Subscribe(subscribe); err != nil {
 			fmt.Fprintf(outStream, "%v\n", err)
 			exitCode = 1
+		} else {
+			fmt.Fprint(outStream, "Done!\n")
 		}
-		fmt.Fprint(outStream, "Done!\n")
 		return
 	}
 
