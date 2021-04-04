@@ -63,7 +63,7 @@ func layout(g *gocui.Gui) error {
 		}
 	}
 
-	if v, err := g.SetView(mainView, int(0.2*float32(maxX)), 0, maxX, int(0.2*float32(maxY))); err != nil {
+	if v, err := g.SetView(mainView, int(0.2*float32(maxX)), 0, maxX, int(0.8*float32(maxY))); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -77,7 +77,7 @@ func layout(g *gocui.Gui) error {
 		}
 	}
 
-	if v, err := g.SetView(detailsView, int(0.2*float32(maxX)), int(0.2*float32(maxY)), maxX, maxY); err != nil {
+	if v, err := g.SetView("details", int(0.2*float32(maxX)), int(0.8*float32(maxY)), maxX, maxY); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
