@@ -92,6 +92,8 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		if err = u.Unsubscribe(); err != nil {
 			fmt.Fprintf(outStream, "%v\n", err)
 			exitCode = 1
+		} else {
+			fmt.Fprint(outStream, "Done!\n")
 		}
 		return
 	}
