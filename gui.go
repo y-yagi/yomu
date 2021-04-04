@@ -258,6 +258,12 @@ func setSite(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		site = l
+
+		for _, name := range []string{mainView, detailsView} {
+			v, _ := g.View(name)
+			v.SetCursor(0, 0)
+			v.SetOrigin(0, 0)
+		}
 	}
 	return nil
 }
