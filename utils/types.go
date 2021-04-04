@@ -10,3 +10,7 @@ type Item struct {
 	Link        string
 	Description string
 }
+
+func (i *Item) String() string {
+	return i.Title + " - " + i.Link
+}

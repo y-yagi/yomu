@@ -73,7 +73,7 @@ func layout(g *gocui.Gui) error {
 		v.SelFgColor = gocui.ColorBlack
 
 		for _, i := range itemsPerSite[site] {
-			fmt.Fprintln(v, i.Link)
+			fmt.Fprintln(v, i.String())
 		}
 	}
 
@@ -98,6 +98,7 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 
 func open(g *gocui.Gui, v *gocui.View) error {
 	var l string
+	var url string
 	var err error
 
 	if v == nil {
@@ -111,7 +112,13 @@ func open(g *gocui.Gui, v *gocui.View) error {
 		l = ""
 	}
 
-	url := l
+	for _, i := range itemsPerSite[site] {
+		if l == i.String() {
+			url = i.Link
+			break
+		}
+	}
+
 	if err := exec.Command(cfg.Browser, url).Run(); err != nil {
 		if err := openByDefault(url); err != nil {
 			fmt.Printf("%v\n", err)
@@ -318,7 +325,7 @@ func refreshMainView(g *gocui.Gui, v *gocui.View) error {
 	if len(l) != 0 {
 		mainView.Clear()
 		for _, r := range itemsPerSite[l] {
-			fmt.Fprintln(mainView, r.Link)
+			fmt.Fprintln(mainView, r.String())
 		}
 	}
 	return nil
