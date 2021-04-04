@@ -77,8 +77,7 @@ func layout(g *gocui.Gui) error {
 		}
 	}
 
-	if v, err := g.SetView("details", int(0.2*float32(maxX)), int(0.2*float32(maxY)), maxX, maxY); err != nil {
-
+	if v, err := g.SetView(detailsView, int(0.2*float32(maxX)), int(0.2*float32(maxY)), maxX, maxY); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -301,7 +300,7 @@ func refreshDetailsView(g *gocui.Gui) error {
 	_, cy := mainView.Cursor()
 	_, oy := mainView.Origin()
 
-	detailsView, _ := g.View("details")
+	detailsView, _ := g.View(detailsView)
 	detailsView.Clear()
 
 	item := itemsPerSite[site][cy+oy]
