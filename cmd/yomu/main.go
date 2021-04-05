@@ -51,7 +51,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	flags := flag.NewFlagSet(app, flag.ExitOnError)
 	flags.SetOutput(errStream)
 	flags.BoolVar(&configureFlag, "c", false, "configure")
-	flags.StringVar(&subscribe, "s", "", "subscribe an `URL`")
+	flags.StringVar(&subscribe, "s", "", "subscribe feeds from `URL`")
 	flags.BoolVar(&unsubscribeFlag, "u", false, "unsubscribe feeds")
 	flags.Parse(args[1:])
 
