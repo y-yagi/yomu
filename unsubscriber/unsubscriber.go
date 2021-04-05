@@ -3,15 +3,15 @@ package unsubscriber
 import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/y-yagi/configure"
-	"github.com/y-yagi/yomu/utils"
+	"github.com/y-yagi/yomu"
 )
 
 type Unsubscriber struct {
 	app string
-	cfg utils.Config
+	cfg yomu.Config
 }
 
-func NewUnsubscriber(app string, cfg utils.Config) *Unsubscriber {
+func NewUnsubscriber(app string, cfg yomu.Config) *Unsubscriber {
 	return &Unsubscriber{app: app, cfg: cfg}
 }
 

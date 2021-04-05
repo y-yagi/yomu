@@ -1,4 +1,4 @@
-package utils
+package yomu
 
 type Config struct {
 	URLs    map[string]string `toml:"urls"`

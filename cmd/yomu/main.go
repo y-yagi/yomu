@@ -12,14 +12,14 @@ import (
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/gocui"
 	"github.com/y-yagi/goext/osext"
+	"github.com/y-yagi/yomu"
 	"github.com/y-yagi/yomu/subscriber"
 	"github.com/y-yagi/yomu/unsubscriber"
-	"github.com/y-yagi/yomu/utils"
 )
 
 var (
-	cfg          utils.Config
-	itemsPerSite = map[string][]utils.Item{}
+	cfg          yomu.Config
+	itemsPerSite = map[string][]yomu.Item{}
 	site         string
 )
 
@@ -33,7 +33,7 @@ const (
 func init() {
 	f := filepath.Join(configure.ConfigDir(app), "config.toml")
 	if !osext.IsExist(f) {
-		c := utils.Config{Browser: "google-chrome", URLs: map[string]string{}}
+		c := yomu.Config{Browser: "google-chrome", URLs: map[string]string{}}
 		configure.Save(app, c)
 	}
 }
@@ -143,13 +143,13 @@ func editConfig() error {
 func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	var items []utils.Item
+	var items []yomu.Item
 
 	fp := gofeed.NewParser()
 	feed, _ := fp.ParseURL(url)
 
 	for _, item := range feed.Items {
-		item := utils.Item{Title: item.Title, Link: item.Link, Description: item.Description}
+		item := yomu.Item{Title: item.Title, Link: item.Link, Description: item.Description}
 		items = append(items, item)
 	}
 

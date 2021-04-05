@@ -7,15 +7,15 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/rssfinder"
-	"github.com/y-yagi/yomu/utils"
+	"github.com/y-yagi/yomu"
 )
 
 type Subscriber struct {
 	app string
-	cfg utils.Config
+	cfg yomu.Config
 }
 
-func NewSubscriber(app string, cfg utils.Config) *Subscriber {
+func NewSubscriber(app string, cfg yomu.Config) *Subscriber {
 	return &Subscriber{app: app, cfg: cfg}
 }
 
