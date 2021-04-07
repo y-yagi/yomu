@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/y-yagi/configure"
@@ -39,7 +40,13 @@ func init() {
 }
 
 func main() {
-	os.Exit(run(os.Args, os.Stdout, os.Stderr))
+	exitCode := run(os.Args, os.Stdout, os.Stderr)
+	if cfg.URLs != nil {
+		now := time.Now()
+		cfg.LastAccessed = now.UnixNano()
+		configure.Save(app, cfg)
+	}
+	os.Exit(exitCode)
 }
 
 func run(args []string, outStream, errStream io.Writer) (exitCode int) {
