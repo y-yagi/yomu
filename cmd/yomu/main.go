@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/y-yagi/configure"
@@ -39,7 +40,13 @@ func init() {
 }
 
 func main() {
-	os.Exit(run(os.Args, os.Stdout, os.Stderr))
+	exitCode := run(os.Args, os.Stdout, os.Stderr)
+	if cfg.URLs != nil {
+		now := time.Now()
+		cfg.LastAccessed = now.UnixNano()
+		configure.Save(app, cfg)
+	}
+	os.Exit(exitCode)
 }
 
 func run(args []string, outStream, errStream io.Writer) (exitCode int) {
@@ -153,5 +160,13 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 		items = append(items, item)
 	}
 
-	itemsPerSite[feed.Title] = items
+	siteTitle := feed.Title
+	if len(feed.Items) > 0 {
+		fmt.Printf("%v, %v\n", feed.Items[0].PublishedParsed.UnixNano(), cfg.LastAccessed)
+		if feed.Items[0].PublishedParsed.UnixNano() > cfg.LastAccessed {
+			siteTitle = "*" + siteTitle
+		}
+	}
+
+	itemsPerSite[siteTitle] = items
 }
