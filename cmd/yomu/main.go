@@ -22,6 +22,7 @@ var (
 	cfg          yomu.Config
 	itemsPerSite = map[string][]yomu.Item{}
 	site         string
+	mu           sync.RWMutex
 )
 
 const (
@@ -167,5 +168,7 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 		}
 	}
 
+	mu.Lock()
+	defer mu.Unlock()
 	itemsPerSite[siteTitle] = items
 }
