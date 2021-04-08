@@ -162,7 +162,7 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	}
 
 	siteTitle := feed.Title
-	if len(feed.Items) > 0 {
+	if len(feed.Items) > 0 && feed.Items[0].PublishedParsed != nil {
 		if feed.Items[0].PublishedParsed.UnixNano() > cfg.LastAccessed {
 			siteTitle = "*" + siteTitle
 		}
