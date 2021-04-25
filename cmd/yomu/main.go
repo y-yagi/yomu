@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 
@@ -19,10 +20,11 @@ import (
 )
 
 var (
-	cfg          yomu.Config
-	itemsPerSite = map[string][]yomu.Item{}
-	site         string
-	mu           sync.RWMutex
+	cfg            yomu.Config
+	itemsPerSite   = map[string][]yomu.Item{}
+	siteDataPerURL = map[string]map[string][]yomu.Item{}
+	site           string
+	mu             sync.RWMutex
 )
 
 const (
@@ -107,11 +109,25 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	}
 
 	var wg sync.WaitGroup
+	var urls []string
 	for url := range cfg.URLs {
+		urls = append(urls, url)
 		wg.Add(1)
 		go fetch(url, errStream, &wg)
 	}
 	wg.Wait()
+
+	sort.Strings(urls)
+	fmt.Printf("%v\n", urls)
+	panic(urls)
+
+	for _, url := range urls {
+		if d, ok := siteDataPerURL[url]; ok {
+			for title, items := range d {
+				itemsPerSite[title] = items
+			}
+		}
+	}
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -170,5 +186,5 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 
 	mu.Lock()
 	defer mu.Unlock()
-	itemsPerSite[siteTitle] = items
+	siteDataPerURL[url] = map[string][]yomu.Item{siteTitle: items}
 }
