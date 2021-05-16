@@ -154,7 +154,11 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	var items []yomu.Item
 
 	fp := gofeed.NewParser()
-	feed, _ := fp.ParseURL(url)
+	feed, err := fp.ParseURL(url)
+	if err != nil {
+		fmt.Fprintf(errStream, "parse error: %v\n", err)
+		return
+	}
 
 	for _, item := range feed.Items {
 		item := yomu.Item{Title: item.Title, Link: item.Link, Description: item.Description}
