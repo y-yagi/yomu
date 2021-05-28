@@ -23,6 +23,7 @@ var (
 	itemsPerSite = map[string][]yomu.Item{}
 	site         string
 	mu           sync.RWMutex
+	showFeeds    bool
 )
 
 const (
@@ -42,7 +43,7 @@ func init() {
 
 func main() {
 	exitCode := run(os.Args, os.Stdout, os.Stderr)
-	if cfg.URLs != nil {
+	if cfg.URLs != nil && showFeeds {
 		now := time.Now()
 		cfg.LastAccessed = now.UnixNano()
 		configure.Save(app, cfg)
@@ -136,6 +137,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		return
 	}
 
+	showFeeds = true
 	return
 }
 
