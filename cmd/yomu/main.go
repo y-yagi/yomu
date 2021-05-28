@@ -166,8 +166,10 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	}
 
 	siteTitle := feed.Title
-	if len(feed.Items) > 0 && feed.Items[0].PublishedParsed != nil {
-		if feed.Items[0].PublishedParsed.UnixNano() > cfg.LastAccessed {
+	if len(feed.Items) > 0 {
+		if feed.Items[0].PublishedParsed != nil && feed.Items[0].PublishedParsed.UnixNano() > cfg.LastAccessed {
+			siteTitle = "*" + siteTitle
+		} else if feed.Items[0].UpdatedParsed != nil && feed.Items[0].UpdatedParsed.UnixNano() > cfg.LastAccessed {
 			siteTitle = "*" + siteTitle
 		}
 	}
