@@ -158,7 +158,7 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(url)
 	if err != nil {
-		fmt.Fprintf(errStream, "parse error: %v\n", err)
+		fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
 		return
 	}
 
