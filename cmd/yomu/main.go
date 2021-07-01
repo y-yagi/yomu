@@ -110,7 +110,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	var wg sync.WaitGroup
 	for url := range cfg.URLs {
 		wg.Add(1)
-		go fetch(url, errStream, &wg)
+		go fetch(url, errStream, outStream, &wg)
 	}
 	wg.Wait()
 
@@ -150,8 +150,12 @@ func editConfig() error {
 	return configure.Edit(app, editor)
 }
 
-func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
+func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	defer wg.Done()
+
+	if os.Getenv("YOMU_DEBUG") != "" {
+		fmt.Fprintf(outStream, "'%v' parse start %v\n", url, time.Now())
+	}
 
 	var items []yomu.Item
 
@@ -179,4 +183,8 @@ func fetch(url string, errStream io.Writer, wg *sync.WaitGroup) {
 	mu.Lock()
 	defer mu.Unlock()
 	itemsPerSite[siteTitle] = items
+
+	if os.Getenv("YOMU_DEBUG") != "" {
+		fmt.Fprintf(outStream, "'%v' parse end %v\n", url, time.Now())
+	}
 }
