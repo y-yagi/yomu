@@ -4,11 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
+	"github.com/gregjones/httpcache"
+	"github.com/gregjones/httpcache/diskcache"
 	"github.com/mmcdole/gofeed"
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/gocui"
@@ -24,6 +27,7 @@ var (
 	site         string
 	mu           sync.RWMutex
 	showFeeds    bool
+	cachePath    string
 )
 
 const (
@@ -39,6 +43,12 @@ func init() {
 		c := yomu.Config{Browser: "google-chrome", URLs: map[string]string{}}
 		configure.Save(app, c)
 	}
+
+	dir, err := os.UserCacheDir()
+	if err != nil {
+		dir = "."
+	}
+	cachePath = filepath.Join(dir, app)
 }
 
 func main() {
@@ -160,6 +170,7 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	var items []yomu.Item
 
 	fp := gofeed.NewParser()
+	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cachePath))}
 	feed, err := fp.ParseURL(url)
 	if err != nil {
 		fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
