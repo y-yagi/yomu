@@ -27,8 +27,9 @@ func (u *Unsubscriber) Unsubscribe() error {
 	}
 
 	prompt := &survey.MultiSelect{
-		Message: "What feeds do you want to unsubscribe to:",
-		Options: options,
+		Message:  "What feeds do you want to unsubscribe to:",
+		Options:  options,
+		PageSize: 20,
 	}
 	survey.AskOne(prompt, &selected)
 
