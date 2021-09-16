@@ -4,6 +4,7 @@ type Config struct {
 	URLs         map[string]string `toml:"urls"`
 	Browser      string            `toml:"browser"`
 	LastAccessed int64             `toml:"last_accessed"`
+	Timeout      int               `toml:"timeout"`
 }
 
 type Item struct {

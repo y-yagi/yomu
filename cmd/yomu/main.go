@@ -169,8 +169,9 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 
 	var items []yomu.Item
 
+	timeout := cfg.Timeout
 	fp := gofeed.NewParser()
-	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cachePath))}
+	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cachePath)), Timeout: time.Duration(timeout) * time.Second}
 	feed, err := fp.ParseURL(url)
 	if err != nil {
 		fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
