@@ -54,8 +54,6 @@ func init() {
 func main() {
 	exitCode := run(os.Args, os.Stdout, os.Stderr)
 	if cfg.URLs != nil && showFeeds {
-		now := time.Now()
-		cfg.LastAccessed = now.UnixNano()
 		configure.Save(app, cfg)
 	}
 	os.Exit(exitCode)
@@ -83,6 +81,9 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 
 	if cfg.URLs == nil {
 		cfg.URLs = map[string]string{}
+	}
+	if cfg.LastFetched == nil {
+		cfg.LastFetched = map[string]int64{}
 	}
 
 	if configureFlag {
@@ -185,9 +186,9 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 
 	siteTitle := feed.Title
 	if len(feed.Items) > 0 {
-		if feed.Items[0].PublishedParsed != nil && feed.Items[0].PublishedParsed.UnixNano() > cfg.LastAccessed {
+		if feed.Items[0].PublishedParsed != nil && feed.Items[0].PublishedParsed.UnixNano() > cfg.LastFetched[url] {
 			siteTitle = "*" + siteTitle
-		} else if feed.Items[0].UpdatedParsed != nil && feed.Items[0].UpdatedParsed.UnixNano() > cfg.LastAccessed {
+		} else if feed.Items[0].UpdatedParsed != nil && feed.Items[0].UpdatedParsed.UnixNano() > cfg.LastFetched[url] {
 			siteTitle = "*" + siteTitle
 		}
 	}
@@ -195,6 +196,7 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	mu.Lock()
 	defer mu.Unlock()
 	itemsPerSite[siteTitle] = items
+	cfg.LastFetched[url] = time.Now().UnixNano()
 
 	if os.Getenv("YOMU_DEBUG") != "" {
 		fmt.Fprintf(outStream, "'%v' parse end %v\n", url, time.Now())
