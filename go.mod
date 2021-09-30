@@ -20,6 +20,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nsf/termbox-go v1.1.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
+	github.com/robfig/cron v1.2.0
 	github.com/y-yagi/configure v0.2.0
 	github.com/y-yagi/gocui v0.4.0
 	github.com/y-yagi/goext v0.6.0
