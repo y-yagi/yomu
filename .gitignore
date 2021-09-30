@@ -1,2 +1,2 @@
 cmd/yomu/yomu
-cmd/yomu-server/yomu-server
+cmd/yomu-daemon/yomu-daemon
