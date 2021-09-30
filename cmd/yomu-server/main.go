@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"log/syslog"
 	"net/http"
 	"os"
@@ -19,10 +18,6 @@ import (
 
 var (
 	cfg       yomu.Config
-	site      string
-	mu        sync.RWMutex
-	showFeeds bool
-	cachePath string
 	syslogger *syslog.Writer
 )
 
@@ -44,7 +39,9 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 
 	syslogger, err = syslog.New(syslog.LOG_NOTICE|syslog.LOG_USER, "yomu-server")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(errStream, "%v\n", err)
+		exitCode = 1
+		return
 	}
 
 	fetchAll()
@@ -55,7 +52,9 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		fetchAll()
 	})
 	if err != nil {
-		log.Fatal("Job setting failed: %v\n", err)
+		fmt.Fprintf(errStream, "Job setting failed: %v\n", err)
+		exitCode = 1
+		return
 	}
 	c.Start()
 

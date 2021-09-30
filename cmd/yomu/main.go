@@ -197,14 +197,17 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 		}
 
 		feed, err = fp.ParseString(string(body))
+		if err != nil {
+			fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
+			return
+		}
 	} else {
 		fp.Client = &http.Client{Timeout: time.Duration(cfg.Timeout) * time.Second}
 		feed, err = fp.ParseURL(url)
-	}
-
-	if err != nil {
-		fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
-		return
+		if err != nil {
+			fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
+			return
+		}
 	}
 
 	for _, item := range feed.Items {
