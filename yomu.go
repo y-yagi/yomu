@@ -5,6 +5,7 @@ type Config struct {
 	Browser     string            `toml:"browser"`
 	LastFetched map[string]int64  `toml:"last_fetched"`
 	Timeout     int               `toml:"timeout"`
+	CachePath   string            `toml:"cache_path"`
 }
 
 type Item struct {

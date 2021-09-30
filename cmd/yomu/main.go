@@ -27,7 +27,6 @@ var (
 	site         string
 	mu           sync.RWMutex
 	showFeeds    bool
-	cachePath    string
 )
 
 const (
@@ -38,17 +37,17 @@ const (
 )
 
 func init() {
-	f := filepath.Join(configure.ConfigDir(app), "config.toml")
-	if !osext.IsExist(f) {
-		c := yomu.Config{Browser: "google-chrome", URLs: map[string]string{}}
-		configure.Save(app, c)
-	}
-
 	dir, err := os.UserCacheDir()
 	if err != nil {
-		dir = "."
+		dir = "/tmp"
 	}
-	cachePath = filepath.Join(dir, app)
+	cachePath := filepath.Join(dir, app)
+
+	f := filepath.Join(configure.ConfigDir(app), "config.toml")
+	if !osext.IsExist(f) {
+		c := yomu.Config{Browser: "google-chrome", URLs: map[string]string{}, CachePath: cachePath}
+		configure.Save(app, c)
+	}
 }
 
 func main() {
@@ -172,7 +171,7 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 
 	timeout := cfg.Timeout
 	fp := gofeed.NewParser()
-	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cachePath)), Timeout: time.Duration(timeout) * time.Second}
+	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cfg.CachePath)), Timeout: time.Duration(timeout) * time.Second}
 	feed, err := fp.ParseURL(url)
 	if err != nil {
 		fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
