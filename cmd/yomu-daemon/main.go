@@ -32,14 +32,14 @@ func main() {
 func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	err := configure.Load(app, &cfg)
 	if err != nil {
-		fmt.Fprintf(errStream, "%v\n", err)
+		fmt.Fprintf(errStream, "Config file loading failed: %v\n", err)
 		exitCode = 1
 		return
 	}
 
-	syslogger, err = syslog.New(syslog.LOG_NOTICE|syslog.LOG_USER, "yomu-server")
+	syslogger, err = syslog.New(syslog.LOG_NOTICE|syslog.LOG_USER, "yomu-daemon")
 	if err != nil {
-		fmt.Fprintf(errStream, "%v\n", err)
+		fmt.Fprintf(errStream, "Syslog writer creating failed: %v\n", err)
 		exitCode = 1
 		return
 	}
@@ -60,7 +60,8 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 
 	<-done
 
-	return 0
+	exitCode = 0
+	return
 }
 
 func fetchAll() {
