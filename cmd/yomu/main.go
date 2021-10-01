@@ -1,16 +1,18 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
-	"github.com/gregjones/httpcache"
 	"github.com/gregjones/httpcache/diskcache"
 	"github.com/mmcdole/gofeed"
 	"github.com/y-yagi/configure"
@@ -168,14 +170,44 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	}
 
 	var items []yomu.Item
+	var err error
+	var feed *gofeed.Feed
 
-	timeout := cfg.Timeout
+	diskcache := diskcache.New(cfg.CachePath)
 	fp := gofeed.NewParser()
-	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cfg.CachePath)), Timeout: time.Duration(timeout) * time.Second}
-	feed, err := fp.ParseURL(url)
-	if err != nil {
-		fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
-		return
+
+	cachedVal, ok := diskcache.Get(url)
+	if ok {
+		b := bytes.NewBuffer(cachedVal)
+		resp, err := http.ReadResponse(bufio.NewReader(b), nil)
+		if err != nil {
+			fmt.Fprintf(errStream, "'%v' read response error: %v\n", url, err)
+			return
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprintf(errStream, "'%v' read response error: %v\n", url, err)
+			return
+		}
+
+		if len(string(body)) == 0 {
+			fmt.Fprintf(errStream, "'%v' response body is empty\n", url)
+			return
+		}
+
+		feed, err = fp.ParseString(string(body))
+		if err != nil {
+			fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
+			return
+		}
+	} else {
+		fp.Client = &http.Client{Timeout: time.Duration(cfg.Timeout) * time.Second}
+		feed, err = fp.ParseURL(url)
+		if err != nil {
+			fmt.Fprintf(errStream, "'%v' parsed error: %v\n", url, err)
+			return
+		}
 	}
 
 	for _, item := range feed.Items {
