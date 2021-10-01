@@ -29,3 +29,10 @@ require (
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
+
+require (
+	github.com/andybalholm/cascadia v1.2.0 // indirect
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
+)
