@@ -10,6 +10,7 @@ import (
 
 	"github.com/gregjones/httpcache"
 	"github.com/gregjones/httpcache/diskcache"
+	"github.com/mmcdole/gofeed"
 	"github.com/robfig/cron"
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/yomu"
@@ -75,8 +76,9 @@ func fetchAll() {
 func fetch(url string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	client := &http.Client{Transport: httpcache.NewTransport(diskcache.New(cfg.CachePath))}
-	_, err := client.Get(url)
+	fp := gofeed.NewParser()
+	fp.Client = &http.Client{Transport: httpcache.NewTransport(diskcache.New(cfg.CachePath))}
+	_, err := fp.ParseURL(url)
 	if err != nil {
 		syslogger.Err(fmt.Sprintf("Fetch '%v' error: %v\n", url, err))
 		return
