@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/gregjones/httpcache"
 	"github.com/gregjones/httpcache/diskcache"
@@ -76,7 +75,7 @@ func fetchAll() {
 func fetch(url string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	client := &http.Client{Transport: httpcache.NewTransport(diskcache.New(cfg.CachePath)), Timeout: time.Duration(cfg.Timeout) * time.Second}
+	client := &http.Client{Transport: httpcache.NewTransport(diskcache.New(cfg.CachePath))}
 	_, err := client.Get(url)
 	if err != nil {
 		syslogger.Err(fmt.Sprintf("Fetch '%v' error: %v\n", url, err))
