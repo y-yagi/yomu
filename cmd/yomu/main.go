@@ -32,10 +32,7 @@ var (
 )
 
 const (
-	mainView    = "main"
-	sideView    = "side"
-	detailsView = "details"
-	app         = "yomu"
+	app = "yomu"
 )
 
 func init() {

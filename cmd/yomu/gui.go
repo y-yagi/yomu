@@ -11,6 +11,12 @@ import (
 	"github.com/y-yagi/gocui"
 )
 
+const (
+	mainView    = "main"
+	sideView    = "side"
+	detailsView = "details"
+)
+
 func keybindings(g *gocui.Gui) error {
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, cursorDown); err != nil {
 		return err
