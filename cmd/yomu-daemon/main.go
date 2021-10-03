@@ -6,8 +6,10 @@ import (
 	"log/syslog"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/gregjones/httpcache"
 	"github.com/gregjones/httpcache/diskcache"
 	"github.com/mmcdole/gofeed"
@@ -19,6 +21,7 @@ import (
 var (
 	cfg       yomu.Config
 	syslogger *syslog.Writer
+	mu        sync.RWMutex
 )
 
 const (
@@ -56,6 +59,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		exitCode = 1
 		return
 	}
+	watchConfigFile()
 	c.Start()
 
 	<-done
@@ -66,7 +70,11 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 
 func fetchAll() {
 	var wg sync.WaitGroup
-	for url := range cfg.URLs {
+	mu.Lock()
+	urls := cfg.URLs
+	mu.Unlock()
+
+	for url := range urls {
 		wg.Add(1)
 		go fetch(url, &wg)
 	}
@@ -83,4 +91,34 @@ func fetch(url string, wg *sync.WaitGroup) {
 		syslogger.Err(fmt.Sprintf("Fetch '%v' error: %v\n", url, err))
 		return
 	}
+}
+
+func watchConfigFile() {
+	file := filepath.Join(configure.ConfigDir(app), "config.toml")
+	watcher, _ := fsnotify.NewWatcher()
+
+	go func() {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				mu.Lock()
+				err := configure.Load(app, &cfg)
+				if err != nil {
+					syslogger.Err(fmt.Sprintf("Watch config file error: %v\n", err))
+				}
+				mu.Unlock()
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			syslogger.Err(fmt.Sprintf("Watch config file error: %v\n", err))
+		}
+
+	}()
+	watcher.Add(file)
 }
