@@ -51,7 +51,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	done := make(chan bool)
 
 	c := cron.New()
-	err = c.AddFunc("@hourly", func() {
+	err = c.AddFunc("*/10 * * * *", func() {
 		fetchAll()
 	})
 	if err != nil {
