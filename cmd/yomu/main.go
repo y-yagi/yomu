@@ -29,6 +29,7 @@ var (
 	site         string
 	mu           sync.RWMutex
 	showFeeds    bool
+	updatedOnly  bool
 )
 
 const (
@@ -68,6 +69,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	flags.BoolVar(&configureFlag, "c", false, "configure")
 	flags.StringVar(&subscribe, "s", "", "subscribe feeds from `URL`")
 	flags.BoolVar(&unsubscribeFlag, "u", false, "unsubscribe feeds")
+	flags.BoolVar(&updatedOnly, "updated-only", false, "show only updated sites")
 	flags.Parse(args[1:])
 
 	err := configure.Load(app, &cfg)
@@ -123,6 +125,11 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	}
 	wg.Wait()
 
+	if len(itemsPerSite) == 0 {
+		fmt.Fprintln(outStream, "There are no new feeds.")
+		return
+	}
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		fmt.Fprintf(errStream, "GUI create error: %v\n", err)
@@ -169,6 +176,7 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	var items []yomu.Item
 	var err error
 	var feed *gofeed.Feed
+	var updated bool
 
 	diskcache := diskcache.New(cfg.CachePath)
 	fp := gofeed.NewParser()
@@ -216,15 +224,25 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	if len(feed.Items) > 0 {
 		if feed.Items[0].PublishedParsed != nil && feed.Items[0].PublishedParsed.UnixNano() > cfg.LastFetched[url] {
 			siteTitle = "*" + siteTitle
+			updated = true
 		} else if feed.Items[0].UpdatedParsed != nil && feed.Items[0].UpdatedParsed.UnixNano() > cfg.LastFetched[url] {
 			siteTitle = "*" + siteTitle
+			updated = true
 		}
 	}
 
 	mu.Lock()
 	defer mu.Unlock()
-	itemsPerSite[siteTitle] = items
-	cfg.LastFetched[url] = time.Now().UnixNano()
+
+	if updatedOnly {
+		if updated {
+			itemsPerSite[siteTitle] = items
+			cfg.LastFetched[url] = time.Now().UnixNano()
+		}
+	} else {
+		itemsPerSite[siteTitle] = items
+		cfg.LastFetched[url] = time.Now().UnixNano()
+	}
 
 	if os.Getenv("YOMU_DEBUG") != "" {
 		fmt.Fprintf(outStream, "'%v' parse end %v\n", url, time.Now())
