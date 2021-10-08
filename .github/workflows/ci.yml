@@ -27,3 +27,8 @@ jobs:
       with:
         version: latest
         args: -D errcheck
+
+    - name: Run test
+      run: |
+        go test -v ./...
+
