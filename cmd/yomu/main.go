@@ -61,13 +61,13 @@ func main() {
 func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	var configureFlag bool
 	var unsubscribeFlag bool
-	var subscribe string
+	var subscriptionTarget string
 	exitCode = 0
 
 	flags := flag.NewFlagSet(app, flag.ExitOnError)
 	flags.SetOutput(errStream)
 	flags.BoolVar(&configureFlag, "c", false, "configure")
-	flags.StringVar(&subscribe, "s", "", "subscribe feeds from `URL`")
+	flags.StringVar(&subscriptionTarget, "s", "", "subscribe feeds from `URL`")
 	flags.BoolVar(&unsubscribeFlag, "u", false, "unsubscribe feeds")
 	flags.BoolVar(&updatedOnly, "updated-only", false, "show only updated sites")
 	flags.Parse(args[1:])
@@ -96,25 +96,13 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		return
 	}
 
-	if len(subscribe) != 0 {
-		s := subscriber.NewSubscriber(app, cfg)
-		if err = s.Subscribe(subscribe); err != nil {
-			fmt.Fprintf(outStream, "%v\n", err)
-			exitCode = 1
-		} else {
-			fmt.Fprint(outStream, "Done!\n")
-		}
+	if len(subscriptionTarget) != 0 {
+		exitCode = subscribe(subscriptionTarget, outStream, errStream)
 		return
 	}
 
 	if unsubscribeFlag {
-		u := unsubscriber.NewUnsubscriber(app, cfg)
-		if err = u.Unsubscribe(); err != nil {
-			fmt.Fprintf(outStream, "%v\n", err)
-			exitCode = 1
-		} else {
-			fmt.Fprint(outStream, "Done!\n")
-		}
+		exitCode = unsubscribe(outStream, errStream)
 		return
 	}
 
@@ -130,30 +118,10 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		return
 	}
 
-	g, err := gocui.NewGui(gocui.OutputNormal)
-	if err != nil {
-		fmt.Fprintf(errStream, "GUI create error: %v\n", err)
-		exitCode = 1
-		return
-	}
-	defer g.Close()
-
-	g.Cursor = true
-	g.SetManagerFunc(layout)
-
-	if err := keybindings(g); err != nil {
-		fmt.Fprintf(errStream, "Key bindings error: %v\n", err)
-		exitCode = 1
-		return
+	if buildGUI(outStream, errStream) == 0 {
+		showFeeds = true
 	}
 
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		fmt.Fprintf(errStream, "Unexpected error: %v\n", err)
-		exitCode = 1
-		return
-	}
-
-	showFeeds = true
 	return
 }
 
@@ -164,6 +132,29 @@ func editConfig() error {
 	}
 
 	return configure.Edit(app, editor)
+}
+
+func subscribe(target string, outStream, errStream io.Writer) int {
+	s := subscriber.NewSubscriber(app, cfg)
+	if err := s.Subscribe(target); err != nil {
+		fmt.Fprintf(outStream, "%v\n", err)
+		return 1
+	} else {
+		fmt.Fprint(outStream, "Done!\n")
+	}
+	return 0
+}
+
+func unsubscribe(outStream, errStream io.Writer) int {
+	u := unsubscriber.NewUnsubscriber(app, cfg)
+	if err := u.Unsubscribe(); err != nil {
+		fmt.Fprintf(outStream, "%v\n", err)
+		return 1
+	} else {
+		fmt.Fprint(outStream, "Done!\n")
+	}
+
+	return 0
 }
 
 func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
@@ -247,4 +238,28 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 	if os.Getenv("YOMU_DEBUG") != "" {
 		fmt.Fprintf(outStream, "'%v' parse end %v\n", url, time.Now())
 	}
+}
+
+func buildGUI(outStream, errStream io.Writer) int {
+	g, err := gocui.NewGui(gocui.OutputNormal)
+	if err != nil {
+		fmt.Fprintf(errStream, "GUI create error: %v\n", err)
+		return 1
+	}
+	defer g.Close()
+
+	g.Cursor = true
+	g.SetManagerFunc(layout)
+
+	if err := keybindings(g); err != nil {
+		fmt.Fprintf(errStream, "Key bindings error: %v\n", err)
+		return 1
+	}
+
+	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		fmt.Fprintf(errStream, "Unexpected error: %v\n", err)
+		return 1
+	}
+
+	return 0
 }
