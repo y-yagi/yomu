@@ -125,6 +125,11 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	}
 	wg.Wait()
 
+	if len(itemsPerSite) == 0 {
+		fmt.Fprintln(outStream, "There are no new feeds.")
+		return
+	}
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		fmt.Fprintf(errStream, "GUI create error: %v\n", err)
