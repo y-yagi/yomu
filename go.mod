@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
-	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/PuerkitoBio/goquery v1.7.1 // indirect
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/google/btree v1.0.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grokify/html-strip-tags-go v0.0.1
@@ -20,7 +20,7 @@ require (
 	github.com/nsf/termbox-go v1.1.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/robfig/cron v1.2.0
-	github.com/y-yagi/configure v0.2.0
+	github.com/y-yagi/configure v0.3.0
 	github.com/y-yagi/gocui v0.4.0
 	github.com/y-yagi/goext v0.6.0
 	github.com/y-yagi/rssfinder v0.1.2
@@ -33,9 +33,9 @@ require (
 require (
 	github.com/Netflix/go-expect v0.0.0-20211003183012-e1a7c020ce25 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/kr/pty v1.1.4 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/stretchr/testify v1.6.1 // indirect
 )
