@@ -8,13 +8,13 @@ import (
 )
 
 type Unsubscriber struct {
-	app   string
-	cfg   yomu.Config
-	stdio terminal.Stdio
+	stdio  terminal.Stdio
+	cfg    yomu.Config
+	cfgure configure.Configure
 }
 
-func NewUnsubscriber(app string, stdio terminal.Stdio, cfg yomu.Config) *Unsubscriber {
-	return &Unsubscriber{app: app, cfg: cfg, stdio: stdio}
+func NewUnsubscriber(stdio terminal.Stdio, cfg yomu.Config, cfgure configure.Configure) *Unsubscriber {
+	return &Unsubscriber{cfg: cfg, stdio: stdio, cfgure: cfgure}
 }
 
 func (u *Unsubscriber) Unsubscribe() error {
@@ -40,5 +40,5 @@ func (u *Unsubscriber) Unsubscribe() error {
 		delete(u.cfg.URLs, url)
 	}
 
-	return configure.Save(u.app, u.cfg)
+	return u.cfgure.Save(u.cfg)
 }

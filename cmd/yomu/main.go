@@ -26,6 +26,7 @@ import (
 
 var (
 	cfg          yomu.Config
+	cfgure       configure.Configure
 	itemsPerSite = map[string][]yomu.Item{}
 	site         string
 	mu           sync.RWMutex
@@ -43,18 +44,19 @@ func init() {
 		dir = "/tmp"
 	}
 	cachePath := filepath.Join(dir, app)
+	cfgure = configure.Configure{Name: app}
 
-	f := filepath.Join(configure.ConfigDir(app), "config.toml")
+	f := filepath.Join(cfgure.ConfigDir(), "config.toml")
 	if !osext.IsExist(f) {
 		c := yomu.Config{Browser: "google-chrome", URLs: map[string]string{}, CachePath: cachePath}
-		configure.Save(app, c)
+		cfgure.Save(c)
 	}
 }
 
 func main() {
 	exitCode := run(os.Args, os.Stdout, os.Stderr)
 	if cfg.URLs != nil && showFeeds {
-		configure.Save(app, cfg)
+		cfgure.Save(cfg)
 	}
 	os.Exit(exitCode)
 }
@@ -73,7 +75,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	flags.BoolVar(&updatedOnly, "updated-only", false, "show only updated sites")
 	flags.Parse(args[1:])
 
-	err := configure.Load(app, &cfg)
+	err := cfgure.Load(&cfg)
 	if err != nil {
 		fmt.Fprintf(errStream, "%v\n", err)
 		exitCode = 1
@@ -132,11 +134,11 @@ func editConfig() error {
 		editor = "vim"
 	}
 
-	return configure.Edit(app, editor)
+	return cfgure.Edit(editor)
 }
 
 func subscribe(target string, outStream, errStream io.Writer) int {
-	s := subscriber.NewSubscriber(app, cfg)
+	s := subscriber.NewSubscriber(cfg, cfgure)
 	if err := s.Subscribe(target); err != nil {
 		fmt.Fprintf(outStream, "%v\n", err)
 		return 1
@@ -148,7 +150,7 @@ func subscribe(target string, outStream, errStream io.Writer) int {
 
 func unsubscribe(outStream, errStream io.Writer) int {
 	stdio := terminal.Stdio{In: os.Stdin, Out: os.Stdout, Err: os.Stderr}
-	u := unsubscriber.NewUnsubscriber(app, stdio, cfg)
+	u := unsubscriber.NewUnsubscriber(stdio, cfg, cfgure)
 	if err := u.Unsubscribe(); err != nil {
 		fmt.Fprintf(outStream, "%v\n", err)
 		return 1

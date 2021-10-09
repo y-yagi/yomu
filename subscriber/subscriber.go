@@ -11,12 +11,12 @@ import (
 )
 
 type Subscriber struct {
-	app string
-	cfg yomu.Config
+	cfg    yomu.Config
+	cfgure configure.Configure
 }
 
-func NewSubscriber(app string, cfg yomu.Config) *Subscriber {
-	return &Subscriber{app: app, cfg: cfg}
+func NewSubscriber(cfg yomu.Config, cfgure configure.Configure) *Subscriber {
+	return &Subscriber{cfg: cfg, cfgure: cfgure}
 }
 
 func (s *Subscriber) Subscribe(rawurl string) error {
@@ -43,7 +43,7 @@ func (s *Subscriber) Subscribe(rawurl string) error {
 		}
 	}
 
-	return configure.Save(s.app, s.cfg)
+	return s.cfgure.Save(s.cfg)
 }
 
 func (s *Subscriber) ask(feeds *[]*rssfinder.Feed) map[string]string {

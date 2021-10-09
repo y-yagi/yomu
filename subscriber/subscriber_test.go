@@ -4,13 +4,15 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/y-yagi/configure"
 	"github.com/y-yagi/yomu"
 	"github.com/y-yagi/yomu/subscriber"
 )
 
 func TestSubscribe(t *testing.T) {
 	cfg := yomu.Config{URLs: map[string]string{}}
-	subscriber := subscriber.NewSubscriber("yomu-test", cfg)
+	cfgure := configure.Configure{Name: "yomu-test"}
+	subscriber := subscriber.NewSubscriber(cfg, cfgure)
 
 	err := subscriber.Subscribe("https://github.com/y-yagi/yomu/commits/master")
 	if err != nil {
@@ -25,7 +27,8 @@ func TestSubscribe(t *testing.T) {
 
 func TestSubscribe_nofeeds(t *testing.T) {
 	var cfg yomu.Config
-	subscriber := subscriber.NewSubscriber("yomu-test", cfg)
+	cfgure := configure.Configure{Name: "yomu-test"}
+	subscriber := subscriber.NewSubscriber(cfg, cfgure)
 
 	err := subscriber.Subscribe("https://github.com/y-yagi/yomu")
 	got := err.Error()
