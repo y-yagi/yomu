@@ -6,6 +6,7 @@ type Config struct {
 	LastFetched map[string]int64  `toml:"last_fetched"`
 	Timeout     int               `toml:"timeout"`
 	CachePath   string            `toml:"cache_path"`
+	BackupPath  string            `toml:"backup_path"`
 }
 
 type Item struct {

@@ -88,6 +88,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 	if cfg.LastFetched == nil {
 		cfg.LastFetched = map[string]int64{}
 	}
+	cfgure.BackupDir = cfg.BackupPath
 
 	if configureFlag {
 		if err = editConfig(); err != nil {
