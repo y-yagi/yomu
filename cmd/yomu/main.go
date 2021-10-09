@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/gregjones/httpcache/diskcache"
 	"github.com/mmcdole/gofeed"
 	"github.com/y-yagi/configure"
@@ -146,7 +147,8 @@ func subscribe(target string, outStream, errStream io.Writer) int {
 }
 
 func unsubscribe(outStream, errStream io.Writer) int {
-	u := unsubscriber.NewUnsubscriber(app, cfg)
+	stdio := terminal.Stdio{In: os.Stdin, Out: os.Stdout, Err: os.Stderr}
+	u := unsubscriber.NewUnsubscriber(app, stdio, cfg)
 	if err := u.Unsubscribe(); err != nil {
 		fmt.Fprintf(outStream, "%v\n", err)
 		return 1

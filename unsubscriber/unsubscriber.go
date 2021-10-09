@@ -2,17 +2,19 @@ package unsubscriber
 
 import (
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/yomu"
 )
 
 type Unsubscriber struct {
-	app string
-	cfg yomu.Config
+	app   string
+	cfg   yomu.Config
+	stdio terminal.Stdio
 }
 
-func NewUnsubscriber(app string, cfg yomu.Config) *Unsubscriber {
-	return &Unsubscriber{app: app, cfg: cfg}
+func NewUnsubscriber(app string, stdio terminal.Stdio, cfg yomu.Config) *Unsubscriber {
+	return &Unsubscriber{app: app, cfg: cfg, stdio: stdio}
 }
 
 func (u *Unsubscriber) Unsubscribe() error {
@@ -31,7 +33,7 @@ func (u *Unsubscriber) Unsubscribe() error {
 		Options:  options,
 		PageSize: 20,
 	}
-	survey.AskOne(prompt, &selected)
+	survey.AskOne(prompt, &selected, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
 
 	for _, key := range selected {
 		url := dict[key]
