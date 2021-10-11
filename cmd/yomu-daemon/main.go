@@ -47,6 +47,7 @@ func run(args []string, outStream, errStream io.Writer) (exitCode int) {
 		return
 	}
 
+	os.RemoveAll(cfg.CachePath)
 	fetchAll()
 	done := make(chan bool)
 
