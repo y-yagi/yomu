@@ -16,6 +16,7 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/gregjones/httpcache/diskcache"
 	"github.com/mmcdole/gofeed"
+	log "github.com/sirupsen/logrus"
 	"github.com/y-yagi/configure"
 	"github.com/y-yagi/gocui"
 	"github.com/y-yagi/goext/osext"
@@ -253,6 +254,11 @@ func buildGUI(outStream, errStream io.Writer) int {
 	}
 	defer g.Close()
 
+	if _, err := setGUILogger(); err != nil {
+		fmt.Fprintf(errStream, "Unexpected error: %v\n", err)
+		return 1
+	}
+
 	g.Cursor = true
 	g.SetManagerFunc(layout)
 
@@ -265,6 +271,17 @@ func buildGUI(outStream, errStream io.Writer) int {
 		fmt.Fprintf(errStream, "Unexpected error: %v\n", err)
 		return 1
 	}
-
 	return 0
+}
+
+func setGUILogger() (*os.File, error) {
+	if os.Getenv("YOMU_DEBUG") == "" {
+		return nil, nil
+	}
+	f, err := os.OpenFile("yomu_gui.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		return nil, err
+	}
+	log.SetOutput(f)
+	return f, nil
 }

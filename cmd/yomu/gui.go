@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 
 	strip "github.com/grokify/html-strip-tags-go"
+	log "github.com/sirupsen/logrus"
 	"github.com/y-yagi/gocui"
 )
 
@@ -162,7 +163,6 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	cx, cy := v.Cursor()
-
 	if v.Name() == sideView {
 		lineCount := len(strings.Split(v.ViewBuffer(), "\n"))
 		if cy+1 == lineCount-2 {
@@ -171,6 +171,9 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	ox, oy := v.Origin()
+	if os.Getenv("YOMU_DEBUG") != "" {
+		log.WithFields(log.Fields{"view": sideView, "cx": cx, "cy": cy, "ox": ox, "oy": oy}).Info("cursor down")
+	}
 
 	cy += 1
 	if cy+oy >= len(itemsPerSite[site]) {
