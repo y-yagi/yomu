@@ -172,7 +172,7 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 
 	ox, oy := v.Origin()
 	if os.Getenv("YOMU_DEBUG") != "" {
-		log.WithFields(log.Fields{"view": sideView, "cx": cx, "cy": cy, "ox": ox, "oy": oy}).Info("cursor down")
+		log.WithFields(log.Fields{"view": v.Name(), "cx": cx, "cy": cy, "ox": ox, "oy": oy}).Info("cursor down")
 	}
 
 	cy += 1
