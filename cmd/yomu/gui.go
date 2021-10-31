@@ -176,6 +176,13 @@ func cursorDown(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	cy += 1
+	if v.Name() == mainView && cy+oy >= len(itemsPerSite[site]) {
+		cy = 0
+		if err := v.SetOrigin(ox, 0); err != nil {
+			return err
+		}
+	}
+
 	if err := v.SetCursor(cx, cy); err != nil {
 		if err := v.SetOrigin(ox, oy+1); err != nil {
 			return err
