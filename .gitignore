@@ -1,2 +1,3 @@
 cmd/yomu/yomu
 cmd/yomu-daemon/yomu-daemon
+*.log
