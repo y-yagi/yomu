@@ -5,13 +5,13 @@ go 1.17
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
 	github.com/Netflix/go-expect v0.0.0-20211003183012-e1a7c020ce25
-	github.com/PuerkitoBio/goquery v1.7.1 // indirect
+	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/google/btree v1.0.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grokify/html-strip-tags-go v0.0.1
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/mattn/go-colorable v0.1.11 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mmcdole/gofeed v1.1.3
