@@ -1,6 +1,9 @@
 package unsubscriber
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/y-yagi/configure"
@@ -28,12 +31,22 @@ func (u *Unsubscriber) Unsubscribe() error {
 		dict[key] = url
 	}
 
-	prompt := &survey.MultiSelect{
+	selectPrompt := &survey.MultiSelect{
 		Message:  "What feeds do you want to unsubscribe to:",
 		Options:  options,
 		PageSize: 20,
 	}
-	survey.AskOne(prompt, &selected, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
+	survey.AskOne(selectPrompt, &selected, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
+
+	confirmed := false
+	confirmPrompt := &survey.Confirm{
+		Message: fmt.Sprintf("Do you really unsubscribe '%v'?", selected),
+	}
+	survey.AskOne(confirmPrompt, &confirmed)
+
+	if !confirmed {
+		return errors.New("canceled")
+	}
 
 	for _, key := range selected {
 		url := dict[key]
