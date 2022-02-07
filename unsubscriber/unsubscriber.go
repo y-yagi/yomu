@@ -38,6 +38,10 @@ func (u *Unsubscriber) Unsubscribe() error {
 	}
 	survey.AskOne(selectPrompt, &selected, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
 
+	if len(selected) == 0 {
+		return errors.New("please select RSSs")
+	}
+
 	confirmed := false
 	confirmPrompt := &survey.Confirm{
 		Message: fmt.Sprintf("Do you really unsubscribe '%v'?", selected),
