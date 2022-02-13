@@ -46,7 +46,7 @@ func (u *Unsubscriber) Unsubscribe() error {
 	confirmPrompt := &survey.Confirm{
 		Message: fmt.Sprintf("Do you really unsubscribe '%v'?", selected),
 	}
-	survey.AskOne(confirmPrompt, &confirmed)
+	survey.AskOne(confirmPrompt, &confirmed, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
 
 	if !confirmed {
 		return errors.New("canceled")
