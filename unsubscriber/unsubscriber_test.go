@@ -14,6 +14,8 @@ import (
 )
 
 func TestUnsubscribe(t *testing.T) {
+	t.Skip()
+
 	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))
 	if err != nil {
 		t.Fatal(err)
