@@ -31,12 +31,16 @@ func (u *Unsubscriber) Unsubscribe() error {
 		dict[key] = url
 	}
 
-	selectPrompt := &survey.MultiSelect{
-		Message:  "What feeds do you want to unsubscribe to:",
-		Options:  options,
-		PageSize: 20,
+	if len(u.cfg.URLs) == 1 {
+		selected = append(selected, options[0])
+	} else {
+		selectPrompt := &survey.MultiSelect{
+			Message:  "What feeds do you want to unsubscribe to:",
+			Options:  options,
+			PageSize: 20,
+		}
+		survey.AskOne(selectPrompt, &selected, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
 	}
-	survey.AskOne(selectPrompt, &selected, survey.WithStdio(u.stdio.In, u.stdio.Out, u.stdio.Err))
 
 	if len(selected) == 0 {
 		return errors.New("please select RSSs")
