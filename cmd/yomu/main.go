@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -187,7 +186,7 @@ func fetch(url string, errStream, outStream io.Writer, wg *sync.WaitGroup) {
 			return
 		}
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprintf(errStream, "'%v' read response error: %v\n", url, err)
 			return
